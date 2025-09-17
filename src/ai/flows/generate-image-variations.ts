@@ -45,21 +45,23 @@ const generateImageVariationsFlow = ai.defineFlow(
         'Generate a refined version of this product image with a complementary background.',
     ];
 
-    const variationPromises = prompts.map(async (promptText) => {
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-image-preview',
-            prompt: [
-              { media: { url: input.photoDataUri } },
-              { text: promptText },
-            ],
-            config: {
-              responseModalities: ['TEXT', 'IMAGE'],
-            },
-          });
-          return media?.url || '';
-    });
-    
-    const imageUrls = (await Promise.all(variationPromises)).filter(url => url);
+    const imageUrls: string[] = [];
+
+    for (const promptText of prompts) {
+      const { media } = await ai.generate({
+          model: 'googleai/gemini-2.5-flash-image-preview',
+          prompt: [
+            { media: { url: input.photoDataUri } },
+            { text: promptText },
+          ],
+          config: {
+            responseModalities: ['TEXT', 'IMAGE'],
+          },
+        });
+      if (media?.url) {
+        imageUrls.push(media.url);
+      }
+    }
 
     return {
         images: imageUrls,
