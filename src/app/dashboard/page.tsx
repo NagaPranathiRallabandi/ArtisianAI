@@ -40,6 +40,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
+import { generateImageVariations } from '@/ai/flows/generate-image-variations';
+
 
 // Mock data - replace with actual data fetching
 const initialArtisanProducts = [
@@ -211,16 +213,29 @@ function AddProductDialog() {
         setIsGenerating(true);
         setStep('GENERATE');
         
-        // MOCK AI call
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        const mockImages = [
-            'https://picsum.photos/seed/gen1/500/500',
-            'https://picsum.photos/seed/gen2/500/500',
-            'https://picsum.photos/seed/gen3/500/500',
-            'https://picsum.photos/seed/gen4/500/500',
-        ]
-        setGeneratedImages(mockImages);
-        setIsGenerating(false);
+        try {
+            const result = await generateImageVariations({ photoDataUri: originalImage });
+            if (result.images && result.images.length > 0) {
+                setGeneratedImages(result.images);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Generation Failed',
+                    description: 'The AI could not generate variations. Please try another image.',
+                });
+                setStep('CHOOSE'); 
+            }
+        } catch (error) {
+            console.error('Error generating image variations:', error);
+            toast({
+                variant: 'destructive',
+                title: 'An Error Occurred',
+                description: 'Something went wrong while generating images. Please try again.',
+            });
+            setStep('CHOOSE');
+        } finally {
+            setIsGenerating(false);
+        }
     }
     
     const selectGeneratedImage = (imageUrl: string) => {
