@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -5,9 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Brush, LogIn, LogOut } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -16,11 +19,10 @@ export function Header() {
     const authenticatedRoutes = ['/dashboard', '/portfolio', '/narrative-crafter'];
     if (authenticatedRoutes.includes(pathname)) {
         setIsLoggedIn(true);
-    } else if (pathname === '/') {
-        // If we are on the home page, assume logged out unless we have a session
-        // For simulation, we'll just set it to false.
+    } else {
         setIsLoggedIn(false);
     }
+    setIsLoading(false);
   }, [pathname]);
 
 
@@ -39,7 +41,7 @@ export function Header() {
           </Link>
         </div>
         <nav className="flex flex-1 items-center justify-center space-x-4">
-          {isLoggedIn && (
+          {!isLoading && isLoggedIn && (
             <>
               <Link href="/dashboard" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
                 Dashboard
@@ -50,8 +52,13 @@ export function Header() {
             </>
           )}
         </nav>
-        <div className="flex items-center justify-end space-x-2">
-          {isLoggedIn ? (
+        <div className="flex items-center justify-end space-x-2 min-w-[200px]">
+          {isLoading ? (
+             <div className="flex items-center gap-2">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-24" />
+             </div>
+          ) : isLoggedIn ? (
             <Button variant="ghost" onClick={handleLogout}>
               <LogOut className="mr-2"/>
               Logout
