@@ -1,10 +1,22 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, you'd handle authentication here.
+    // For now, we'll just redirect to the dashboard.
+    router.push('/dashboard');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary/50 py-12">
       <Card className="mx-auto max-w-sm w-full">
@@ -15,7 +27,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -24,6 +36,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="m@example.com"
                   required
+                  defaultValue="artisan@example.com"
                 />
               </div>
               <div className="grid gap-2">
@@ -33,7 +46,7 @@ export default function LoginPage() {
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" required defaultValue="password" />
               </div>
               <Button type="submit" className="w-full">
                 Login

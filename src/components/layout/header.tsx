@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Brush, LogIn, LogOut } from 'lucide-react';
@@ -11,17 +11,23 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
+  useEffect(() => {
+    // Simulate checking auth state on page load/navigation
+    const authenticatedRoutes = ['/dashboard', '/portfolio', '/narrative-crafter'];
+    if (authenticatedRoutes.includes(pathname)) {
+        setIsLoggedIn(true);
+    } else if (pathname === '/') {
+        // If we are on the home page, assume logged out unless we have a session
+        // For simulation, we'll just set it to false.
+        setIsLoggedIn(false);
+    }
+  }, [pathname]);
+
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     router.push('/');
   };
-
-  // A simple way to simulate login when visiting the login page
-  // In a real app, this would be handled by an auth provider
-  if (pathname === '/login' && !isLoggedIn) {
-      setIsLoggedIn(true);
-  }
-
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,11 +41,11 @@ export function Header() {
         <nav className="flex flex-1 items-center space-x-4">
           {isLoggedIn && (
             <>
+              <Link href="/dashboard" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+                Dashboard
+              </Link>
               <Link href="/narrative-crafter" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
                 AI Narrative Crafter
-              </Link>
-              <Link href="/portfolio" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
-                My Portfolio
               </Link>
             </>
           )}

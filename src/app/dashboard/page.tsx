@@ -1,9 +1,10 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Wand2 } from 'lucide-react';
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -21,7 +22,6 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
-import Link from 'next/link';
 
 // Mock data - replace with actual data fetching
 const artisanProducts = [
@@ -91,16 +91,35 @@ function ProductActions() {
     );
   }
 
-export default function PortfolioPage() {
+export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
-       <div className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-4xl font-bold font-headline mb-4">Portfolio Management</h1>
-        <p className="text-muted-foreground mb-8">This page is now part of the Artisan Dashboard.</p>
-        <Button asChild>
-            <Link href="/dashboard">Go to Dashboard</Link>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div>
+            <h1 className="text-4xl font-bold font-headline">Welcome, Artisan!</h1>
+            <p className="text-muted-foreground mt-1">Manage your craft and story from here.</p>
+        </div>
+        <Button asChild size="lg">
+            <Link href="/narrative-crafter"><Wand2 className="mr-2"/> AI Narrative Crafter</Link>
         </Button>
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <CardTitle>My Portfolio</CardTitle>
+                <CardDescription>A collection of your finest work.</CardDescription>
+            </div>
+            <AddProductDialog />
+        </CardHeader>
+        <CardContent>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {artisanProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+                ))}
+            </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
