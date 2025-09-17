@@ -46,6 +46,7 @@ const generateImageVariationsFlow = ai.defineFlow(
     ];
 
     const imageUrls: string[] = [];
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
     for (const promptText of prompts) {
       const { media } = await ai.generate({
@@ -61,6 +62,8 @@ const generateImageVariationsFlow = ai.defineFlow(
       if (media?.url) {
         imageUrls.push(media.url);
       }
+      // Wait for 1 second before the next request to avoid rate limiting
+      await delay(1000); 
     }
 
     return {
