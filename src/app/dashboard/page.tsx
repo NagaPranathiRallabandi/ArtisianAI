@@ -243,9 +243,11 @@ function AddProductDialog() {
         setStep('FINALIZE');
     }
 
-    const startFinalize = (useOriginal: boolean) => {
-        setSelectedImage(useOriginal ? originalImage : null);
-        setStep('FINALIZE');
+    const startFinalize = () => {
+        if (originalImage) {
+            setSelectedImage(originalImage);
+            setStep('FINALIZE');
+        }
     }
 
     const reset = () => {
@@ -306,7 +308,7 @@ function AddProductDialog() {
                     <div className="p-4 space-y-4">
                         <Image src={originalImage} alt="Uploaded product" width={500} height={500} className="rounded-lg aspect-square object-cover" />
                         <div className="grid grid-cols-2 gap-4">
-                            <Button size="lg" onClick={() => startFinalize(true)}>
+                            <Button size="lg" onClick={startFinalize}>
                                 <UploadCloud className="mr-2"/> Use Original
                             </Button>
                             <Button size="lg" onClick={handleGenerate}>
@@ -362,5 +364,7 @@ function AddProductDialog() {
         </Dialog>
     )
 }
+
+    
 
     
