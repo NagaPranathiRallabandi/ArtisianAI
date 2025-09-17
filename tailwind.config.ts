@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Merriweather', 'serif'],
-        headline: ['Raleway', 'sans-serif'],
+        body: ['Libre Baskerville', 'serif'],
+        headline: ['League Spartan', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
