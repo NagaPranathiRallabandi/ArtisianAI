@@ -62,8 +62,8 @@ const generateImageVariationsFlow = ai.defineFlow(
       if (media?.url) {
         imageUrls.push(media.url);
       }
-      // Wait for 5 seconds before the next request to avoid rate limiting
-      await delay(5000); 
+      // Wait for 15 seconds before the next request to avoid rate limiting
+      await delay(15000); 
     }
 
     return {
