@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,9 +36,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+
 
 // Mock data - replace with actual data fetching
-const artisanProducts = [
+const initialArtisanProducts = [
   {
     id: 'p1',
     name: 'Terracotta Vase',
@@ -59,7 +64,9 @@ const artisanProducts = [
   },
 ];
 
-function ProductCard({ product }: { product: typeof artisanProducts[0] }) {
+type Product = typeof initialArtisanProducts[0];
+
+function ProductCard({ product, onDelete }: { product: Product, onDelete: (id: string) => void }) {
   return (
     <Card>
       <CardContent className="p-4">
@@ -77,14 +84,23 @@ function ProductCard({ product }: { product: typeof artisanProducts[0] }) {
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-sm text-muted-foreground">${product.price.toFixed(2)}</p>
             </div>
-            <ProductActions productName={product.name}/>
+            <ProductActions product={product} onDelete={onDelete}/>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-function ProductActions({ productName }: { productName: string }) {
+function ProductActions({ product, onDelete }: { product: Product, onDelete: (id: string) => void }) {
+    const { toast } = useToast();
+
+    const handleDelete = () => {
+        onDelete(product.id);
+        toast({
+            title: "Product Deleted",
+            description: `"${product.name}" has been removed from your portfolio.`,
+        });
+    }
     return (
       <AlertDialog>
         <DropdownMenu>
@@ -106,12 +122,12 @@ function ProductActions({ productName }: { productName: string }) {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the product "{productName}".
+                This action cannot be undone. This will permanently delete the product "{product.name}".
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Delete</AlertDialogAction>
+              <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -119,6 +135,13 @@ function ProductActions({ productName }: { productName: string }) {
   }
 
 export default function DashboardPage() {
+  const [products, setProducts] = useState<Product[]>(initialArtisanProducts);
+
+  const handleDeleteProduct = (productId: string) => {
+    setProducts((currentProducts) => currentProducts.filter((p) => p.id !== productId));
+  };
+
+
   return (
     <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
@@ -141,10 +164,16 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {artisanProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} onDelete={handleDeleteProduct}/>
                 ))}
             </div>
+            {products.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                    <p>Your portfolio is empty.</p>
+                    <p>Click "Add Product" to start building your collection.</p>
+                </div>
+            )}
         </CardContent>
       </Card>
     </div>
