@@ -7,7 +7,7 @@ import { ArrowRight } from 'lucide-react';
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="w-full py-20 md:py-32 lg:py-40 bg-secondary/50">
+      <section className="w-full py-20 md:py-32 lg:py-40 bg-secondary/20">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter mb-4 font-headline">
             Where Craftsmanship Meets AI
