@@ -51,13 +51,10 @@ const generateImageVariationsFlow = ai.defineFlow(
     for (const promptText of prompts) {
       const { media } = await ai.generate({
           model: 'googleai/imagen-2',
-          prompt: [
+          prompt: promptText,
+          input: [
             { media: { url: input.photoDataUri } },
-            { text: promptText },
           ],
-          config: {
-            responseModalities: ['TEXT', 'IMAGE'],
-          },
         });
       if (media?.url) {
         imageUrls.push(media.url);
