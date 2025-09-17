@@ -4,9 +4,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Brush, LogIn, LogOut } from 'lucide-react';
+import { Brush, LogIn, LogOut, UserCircle } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EditProfileDialog } from '@/components/edit-profile-dialog';
 
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,11 +17,18 @@ export function Header() {
 
   useEffect(() => {
     // Simulate checking auth state on page load/navigation
+    // In a real app, this would check a token or session
+    setIsLoading(true);
     const authenticatedRoutes = ['/dashboard', '/portfolio', '/narrative-crafter'];
     if (authenticatedRoutes.includes(pathname)) {
         setIsLoggedIn(true);
     } else {
-        setIsLoggedIn(false);
+        // A simple check for demonstration. A real app would have more robust logic.
+        // For now, let's keep the user logged in if they navigate away from dashboard
+        // unless they are on login/signup.
+        if (pathname === '/login' || pathname === '/signup' || pathname === '/') {
+            setIsLoggedIn(false);
+        }
     }
     setIsLoading(false);
   }, [pathname]);
@@ -59,10 +67,13 @@ export function Header() {
                 <Skeleton className="h-8 w-24" />
              </div>
           ) : isLoggedIn ? (
-            <Button variant="ghost" onClick={handleLogout}>
-              <LogOut className="mr-2"/>
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+               <EditProfileDialog />
+              <Button variant="ghost" onClick={handleLogout}>
+                <LogOut className="mr-2"/>
+                Logout
+              </Button>
+            </div>
           ) : (
             <>
               <Button asChild variant="ghost">
