@@ -50,7 +50,7 @@ const generateImageVariationsFlow = ai.defineFlow(
 
     for (const promptText of prompts) {
       const { media } = await ai.generate({
-          model: 'googleai/gemini-pro-vision',
+          model: 'googleai/imagen-2',
           prompt: [
             { media: { url: input.photoDataUri } },
             { text: promptText },
