@@ -1,3 +1,64 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "artisan-elena",
+      "description": "Portrait of Elena, a ceramicist.",
+      "imageUrl": "https://picsum.photos/seed/elena/600/600",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "artisan-liam",
+      "description": "Portrait of Liam, a woodworker.",
+      "imageUrl": "https://picsum.photos/seed/liam/600/600",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "artisan-aisha",
+      "description": "Portrait of Aisha, a textile artist.",
+      "imageUrl": "https://picsum.photos/seed/aisha/600/600",
+      "imageHint": "woman artist"
+    },
+    {
+      "id": "product-vase",
+      "description": "A handcrafted ceramic vase.",
+      "imageUrl": "https://picsum.photos/seed/vase/500/500",
+      "imageHint": "ceramic vase"
+    },
+    {
+      "id": "product-mug",
+      "description": "A handcrafted ceramic mug.",
+      "imageUrl": "https://picsum.photos/seed/mug/500/500",
+      "imageHint": "ceramic mug"
+    },
+    {
+      "id": "product-bowl",
+      "description": "A handcrafted ceramic bowl.",
+      "imageUrl": "https://picsum.photos/seed/bowl/500/500",
+      "imageHint": "ceramic bowl"
+    },
+    {
+      "id": "product-chair",
+      "description": "A handcrafted wooden chair.",
+      "imageUrl": "https://picsum.photos/seed/chair/500/500",
+      "imageHint": "wooden chair"
+    },
+    {
+      "id": "product-table",
+      "description": "A handcrafted wooden table.",
+      "imageUrl": "https://picsum.photos/seed/table/500/500",
+      "imageHint": "wooden table"
+    },
+    {
+      "id": "product-scarf",
+      "description": "A handwoven textile scarf.",
+      "imageUrl": "https://picsum.photos/seed/scarf/500/500",
+      "imageHint": "woven scarf"
+    },
+    {
+      "id": "product-tapestry",
+      "description": "A large, intricate wall tapestry.",
+      "imageUrl": "https://picsum.photos/seed/tapestry/500/500",
+      "imageHint": "wall tapestry"
+    }
+  ]
 }
