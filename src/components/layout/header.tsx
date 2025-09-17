@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Brush } from 'lucide-react';
+import { Brush, LogIn } from 'lucide-react';
 
 export function Header() {
   return (
@@ -16,9 +16,20 @@ export function Header() {
           <Link href="/narrative-crafter" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
             AI Narrative Crafter
           </Link>
+          <Link href="/portfolio" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+            My Portfolio
+          </Link>
         </nav>
-        <div className="flex items-center justify-end space-x-4">
-            <Button>For Artisans</Button>
+        <div className="flex items-center justify-end space-x-2">
+            <Button asChild variant="ghost">
+                <Link href="/login">
+                    <LogIn className="mr-2"/>
+                    Login
+                </Link>
+            </Button>
+            <Button asChild>
+                <Link href="/signup">Sign Up</Link>
+            </Button>
         </div>
       </div>
     </header>
