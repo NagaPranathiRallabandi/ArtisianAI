@@ -38,7 +38,7 @@ export function Header() {
             <span>ArtisanAI</span>
           </Link>
         </div>
-        <nav className="flex flex-1 items-center space-x-4">
+        <nav className="flex flex-1 items-center justify-center space-x-4">
           {isLoggedIn && (
             <>
               <Link href="/dashboard" className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
