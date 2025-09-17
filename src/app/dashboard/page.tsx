@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, MoreHorizontal, Wand2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Wand2, UploadCloud, Sparkles, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -37,7 +38,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { cn } from '@/lib/utils';
 
 // Mock data - replace with actual data fetching
 const initialArtisanProducts = [
@@ -180,44 +182,170 @@ export default function DashboardPage() {
   );
 }
 
+type DialogStep = 'UPLOAD' | 'CHOOSE' | 'GENERATE' | 'FINALIZE';
+
 function AddProductDialog() {
+    const [step, setStep] = useState<DialogStep>('UPLOAD');
+    const [originalImage, setOriginalImage] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const { toast } = useToast();
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const dataUri = reader.result as string;
+                setOriginalImage(dataUri);
+                setSelectedImage(dataUri);
+                setStep('CHOOSE');
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleGenerate = async () => {
+        if (!originalImage) return;
+        setIsGenerating(true);
+        setStep('GENERATE');
+        
+        // MOCK AI call
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        const mockImages = [
+            'https://picsum.photos/seed/gen1/500/500',
+            'https://picsum.photos/seed/gen2/500/500',
+            'https://picsum.photos/seed/gen3/500/500',
+            'https://picsum.photos/seed/gen4/500/500',
+        ]
+        setGeneratedImages(mockImages);
+        setIsGenerating(false);
+    }
+    
+    const selectGeneratedImage = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+        setStep('FINALIZE');
+    }
+
+    const startFinalize = (useOriginal: boolean) => {
+        setSelectedImage(useOriginal ? originalImage : null);
+        setStep('FINALIZE');
+    }
+
+    const reset = () => {
+        setStep('UPLOAD');
+        setOriginalImage(null);
+        setSelectedImage(null);
+        setGeneratedImages([]);
+        setIsGenerating(false);
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Handle form submission logic
+        toast({ title: 'Product Added!', description: 'Your new product has been saved.' });
+        reset();
+    }
+    
     return (
-        <Dialog>
+        <Dialog onOpenChange={(open) => !open && reset()}>
             <DialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2"/>
                     Add Product
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[480px]">
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Add New Product</DialogTitle>
-                    <DialogDescription>
-                        Fill out the details below to add a new product to your portfolio.
+                    {step !== 'UPLOAD' && (
+                        <Button variant="ghost" size="sm" className="absolute left-4 top-4" onClick={() => setStep('UPLOAD')}>
+                            <ArrowLeft className="mr-2" /> Back
+                        </Button>
+                    )}
+                    <DialogTitle className="text-center pt-8 md:pt-0">
+                        {step === 'UPLOAD' && 'Upload Product Image'}
+                        {step === 'CHOOSE' && 'Choose Your Next Step'}
+                        {step === 'GENERATE' && 'Generating Variations'}
+                        {step === 'FINALIZE' && 'Add Product Details'}
+                    </DialogTitle>
+                    <DialogDescription className="text-center">
+                        {step === 'UPLOAD' && 'Start by uploading a high-quality photo of your product.'}
+                        {step === 'CHOOSE' && 'Would you like to use this image or generate AI variations?'}
+                        {step === 'GENERATE' && (isGenerating ? 'Our AI is crafting new versions of your product...' : 'Select your favorite generated image.')}
+                        {step === 'FINALIZE' && 'Fill out the details for your new product.'}
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="picture">Product Image</Label>
-                        <Input id="picture" type="file" />
+
+                {step === 'UPLOAD' && (
+                    <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg">
+                        <UploadCloud className="w-12 h-12 text-muted-foreground mb-4" />
+                        <Label htmlFor="picture-upload" className={cn(buttonVariants(), "cursor-pointer")}>
+                            Choose an Image
+                        </Label>
+                        <Input id="picture-upload" type="file" className="sr-only" onChange={handleFileChange} accept="image/*"/>
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Product Name</Label>
-                        <Input id="name" placeholder="e.g., Terracotta Vase"/>
+                )}
+                
+                {step === 'CHOOSE' && originalImage && (
+                    <div className="p-4 space-y-4">
+                        <Image src={originalImage} alt="Uploaded product" width={500} height={500} className="rounded-lg aspect-square object-cover" />
+                        <div className="grid grid-cols-2 gap-4">
+                            <Button size="lg" onClick={() => startFinalize(true)}>
+                                <UploadCloud className="mr-2"/> Use Original
+                            </Button>
+                            <Button size="lg" onClick={handleGenerate}>
+                                <Sparkles className="mr-2"/> Generate
+                            </Button>
+                        </div>
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="price">Price</Label>
-                        <Input id="price" type="number" placeholder="e.g., 75.00"/>
+                )}
+
+                {step === 'GENERATE' && (
+                    <div className="p-4">
+                        {isGenerating ? (
+                            <div className="flex flex-col items-center justify-center min-h-[300px]">
+                                <LoadingSpinner className="w-16 h-16 text-primary"/>
+                                <p className="mt-4 text-muted-foreground">Please wait...</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                                {generatedImages.map((img, i) => (
+                                    <button key={i} className="relative aspect-square group rounded-lg overflow-hidden" onClick={() => selectGeneratedImage(img)}>
+                                        <Image src={img} alt={`Generated image ${i+1}`} fill className="object-cover"/>
+                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <p className="text-white font-bold">Select</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" placeholder="Describe your product..."/>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button type="submit">Save Product</Button>
-                </DialogFooter>
+                )}
+
+                {step === 'FINALIZE' && selectedImage && (
+                     <form onSubmit={handleSubmit} className="px-4 pb-4 space-y-4">
+                        <Image src={selectedImage} alt="Selected product" width={500} height={500} className="rounded-lg aspect-square object-cover" />
+                        <div className="grid gap-2">
+                            <Label htmlFor="name">Product Name</Label>
+                            <Input id="name" placeholder="e.g., Terracotta Vase" required/>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="price">Price</Label>
+                            <Input id="price" type="number" placeholder="e.g., 75.00" required/>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea id="description" placeholder="Describe your product..." required/>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit" className="w-full">Save Product</Button>
+                        </DialogFooter>
+                    </form>
+                )}
             </DialogContent>
         </Dialog>
     )
 }
+
+    
