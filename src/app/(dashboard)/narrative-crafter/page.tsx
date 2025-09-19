@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { NarrativeForm } from '@/app/narrative-crafter/narrative-form';
+import { NarrativeForm } from '@/components/narrative-form';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function NarrativeCrafterPage() {
