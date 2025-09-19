@@ -9,25 +9,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // In a real app, you'd handle authentication here.
-    // For now, we'll simulate a check.
-    if (email === 'artisan@example.com' && password === 'password123') {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
-    } else {
-      setError('Invalid email or password. Please try again.');
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        setError('Invalid email or password. Please try again.');
+      } else {
+        setError('An unexpected error occurred during login.');
+      }
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,8 +82,8 @@ export default function LoginPage() {
                 </Alert>
               )}
               
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? <LoadingSpinner /> : 'Login'}
               </Button>
             </div>
           </form>

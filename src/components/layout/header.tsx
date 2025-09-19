@@ -1,37 +1,38 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Brush, LogIn, LogOut } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EditProfileDialog } from '@/components/edit-profile-dialog';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 
 export function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    setIsLoading(true);
-    const authenticatedRoutes = ['/dashboard', '/portfolio', '/narrative-crafter'];
-    if (authenticatedRoutes.includes(pathname)) {
-        setIsLoggedIn(true);
-    } else {
-        if (pathname === '/login' || pathname === '/signup' || pathname === '/') {
-            setIsLoggedIn(false);
-        }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setIsLoading(false);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
+
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out: ", error);
     }
-    setIsLoading(false);
-  }, [pathname]);
-
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    router.push('/');
   };
 
   return (
@@ -52,7 +53,7 @@ export function Header() {
                 <Skeleton className="h-8 w-20" />
                 <Skeleton className="h-8 w-24" />
              </div>
-          ) : isLoggedIn ? (
+          ) : user ? (
             <div className="flex items-center gap-2">
                <EditProfileDialog />
               <Button variant="ghost" onClick={handleLogout}>
