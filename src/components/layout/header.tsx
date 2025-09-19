@@ -55,6 +55,9 @@ export function Header() {
              </div>
           ) : user ? (
             <div className="flex items-center gap-2">
+               <Button asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
                <EditProfileDialog />
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="mr-2"/>
