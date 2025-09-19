@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, MoreHorizontal, Wand2, UploadCloud, Sparkles, ArrowLeft } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Wand2, UploadCloud, Sparkles, ArrowLeft, LayoutGrid, PencilRuler } from 'lucide-react';
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -41,6 +41,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
 import { generateImageVariations } from '@/ai/flows/generate-image-variations';
+import { usePathname } from 'next/navigation';
 
 
 // Mock data - replace with actual data fetching
@@ -138,48 +139,79 @@ function ProductActions({ product, onDelete }: { product: Product, onDelete: (id
     );
   }
 
-export default function DashboardPage() {
-  const [products, setProducts] = useState<Product[]>(initialArtisanProducts);
+function DashboardContent() {
+    const [products, setProducts] = useState<Product[]>(initialArtisanProducts);
 
-  const handleDeleteProduct = (productId: string) => {
-    setProducts((currentProducts) => currentProducts.filter((p) => p.id !== productId));
-  };
+    const handleDeleteProduct = (productId: string) => {
+        setProducts((currentProducts) => currentProducts.filter((p) => p.id !== productId));
+    };
 
-
-  return (
-    <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-        <div>
-            <h1 className="text-4xl font-bold font-headline">Welcome, Artisan!</h1>
-            <p className="text-muted-foreground mt-1">Manage your craft and story from here.</p>
-        </div>
-        <Button asChild size="lg">
-            <Link href="/narrative-crafter"><Wand2 className="mr-2"/> AI Narrative Crafter</Link>
-        </Button>
-      </div>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+    return (
+    <>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
-                <CardTitle>My Portfolio</CardTitle>
-                <CardDescription>A collection of your finest work.</CardDescription>
+                <h1 className="text-4xl font-bold font-headline">Welcome, Artisan!</h1>
+                <p className="text-muted-foreground mt-1">Manage your craft and story from here.</p>
             </div>
-            <AddProductDialog />
-        </CardHeader>
-        <CardContent>
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product) => (
-                    <ProductCard key={product.id} product={product} onDelete={handleDeleteProduct}/>
-                ))}
-            </div>
-            {products.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                    <p>Your portfolio is empty.</p>
-                    <p>Click "Add Product" to start building your collection.</p>
+        </div>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>My Portfolio</CardTitle>
+                    <CardDescription>A collection of your finest work.</CardDescription>
                 </div>
-            )}
-        </CardContent>
-      </Card>
+                <AddProductDialog />
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {products.map((product) => (
+                        <ProductCard key={product.id} product={product} onDelete={handleDeleteProduct}/>
+                    ))}
+                </div>
+                {products.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                        <p>Your portfolio is empty.</p>
+                        <p>Click "Add Product" to start building your collection.</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    </>
+    )
+}
+
+function BottomNav() {
+    const pathname = usePathname();
+    const navItems = [
+        { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
+        { href: '/narrative-crafter', label: 'AI Narrative Crafter', icon: Wand2 },
+    ];
+
+    return (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t z-50">
+            <div className="flex justify-around items-center h-16">
+                {navItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link key={item.href} href={item.href} className={cn(
+                            "flex flex-col items-center justify-center gap-1 w-full text-sm font-medium",
+                            isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        )}>
+                            <item.icon className="w-6 h-6" />
+                            <span>{item.label}</span>
+                        </Link>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+}
+
+export default function DashboardPage() {
+  return (
+    <div className="container mx-auto px-4 md:px-6 py-12 md:py-20 pb-24 md:pb-20">
+      <DashboardContent />
+      <BottomNav />
     </div>
   );
 }
@@ -364,7 +396,3 @@ function AddProductDialog() {
         </Dialog>
     )
 }
-
-    
-
-    
