@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
-import { Brush, LayoutGrid, LogIn, LogOut } from 'lucide-react';
+import { Brush, LogIn, LogOut } from 'lucide-react';
 import { EditProfileDialog } from '../edit-profile-dialog';
 import { LoadingSpinner } from '../ui/loading-spinner';
 
@@ -45,12 +45,6 @@ export function Header() {
             {loading ? <LoadingSpinner className="h-6 w-6"/> : (
               user ? (
                 <>
-                  <Button asChild variant="ghost">
-                    <Link href="/dashboard">
-                      <LayoutGrid className="mr-2"/>
-                      Dashboard
-                    </Link>
-                  </Button>
                   <EditProfileDialog />
                   <Button variant="outline" onClick={handleLogout}>
                     <LogOut className="mr-2"/>
