@@ -55,7 +55,7 @@ export function EditProfileDialog() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="artisan@example.com" defaultValue="artisan@example.com" />
+              <Input id="email" type="email" placeholder="artisan@example.com" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">New Password</Label>
