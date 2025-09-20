@@ -63,6 +63,9 @@ const generateImageVariationsFlow = ai.defineFlow(
       if (media?.url) {
         imageUrls.push(media.url);
       }
+      
+      // Add a delay to avoid hitting rate limits
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
     return {
