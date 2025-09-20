@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -15,6 +15,7 @@ export function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -28,6 +29,8 @@ export function Header() {
     await signOut(auth);
     router.push('/');
   };
+
+  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/narrative-crafter');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -43,7 +46,7 @@ export function Header() {
 
         <div className="flex items-center justify-end space-x-2">
             {loading ? <LoadingSpinner className="h-6 w-6"/> : (
-              user ? (
+              user && isDashboardPage ? (
                 <>
                   <EditProfileDialog />
                   <Button variant="outline" onClick={handleLogout}>
