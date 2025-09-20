@@ -202,15 +202,16 @@ function AddProductDialog() {
         
         try {
             const result = await generateImageVariations({ photoDataUri: originalImage });
+
             if (result.images && result.images.length > 0) {
                 setGeneratedImages(result.images);
             } else {
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: 'The AI could not generate variations. Please try another image.',
+                    description: 'The AI could not generate variations. Please try again later.',
                 });
-                setStep('CHOOSE'); 
+                setStep('CHOOSE');
             }
         } catch (error) {
             console.error('Error generating image variations:', error);
@@ -351,5 +352,3 @@ function AddProductDialog() {
         </Dialog>
     )
 }
-
-    
