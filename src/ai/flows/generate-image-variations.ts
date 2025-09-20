@@ -47,9 +47,9 @@ const generateImageVariationsFlow = ai.defineFlow(
 
     const imageUrls: string[] = [];
     
-    // Create an array of promises for each image generation
-    const generationPromises = prompts.map(promptText => 
-      ai.generate({
+    // Process requests sequentially to avoid rate limiting
+    for (const promptText of prompts) {
+      const { media } = await ai.generate({
         model: 'googleai/gemini-2.5-flash-image-preview',
         prompt: [
           { media: { url: input.photoDataUri } },
@@ -58,17 +58,12 @@ const generateImageVariationsFlow = ai.defineFlow(
         config: {
             responseModalities: ['TEXT', 'IMAGE'],
         }
-      })
-    );
+      });
 
-    // Wait for all promises to resolve
-    const results = await Promise.all(generationPromises);
-
-    results.forEach(({ media }) => {
-        if (media?.url) {
-            imageUrls.push(media.url);
-        }
-    });
+      if (media?.url) {
+        imageUrls.push(media.url);
+      }
+    }
     
     return {
         images: imageUrls,
