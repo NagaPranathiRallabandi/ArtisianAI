@@ -1,7 +1,6 @@
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+// FILENAME: src/ai/genkit.ts
+import 'dotenv/config'; // Load environment variables from .env.local
 
-export const ai = genkit({
-  plugins: [googleAI()],
-  model: 'googleai/gemini-2.5-flash',
-});
+import { genkit } from '@genkit-ai/flow';
+
+export const ai = genkit();

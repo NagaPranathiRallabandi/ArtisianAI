@@ -7,8 +7,9 @@
  * - GenerateImageVariationsOutput - The return type for the generateImageVariations function.
  */
 
-import { ai } from '@/ai/genkit';
+import { runFlow } from '@genkit-ai/flow';
 import { z } from 'genkit';
+import { ai } from '@/ai/genkit';
 
 const GenerateImageVariationsInputSchema = z.object({
   photoDataUri: z
@@ -26,48 +27,63 @@ export type GenerateImageVariationsOutput = z.infer<typeof GenerateImageVariatio
 
 
 export async function generateImageVariations(input: GenerateImageVariationsInput): Promise<GenerateImageVariationsOutput> {
-    return generateImageVariationsFlow(input);
+    return runFlow(generateImageVariationsFlow, input);
 }
 
 
-const generateImageVariationsFlow = ai.defineFlow(
+const generateImageVariationsFlow = ai.flow(
   {
     name: 'generateImageVariationsFlow',
     inputSchema: GenerateImageVariationsInputSchema,
     outputSchema: GenerateImageVariationsOutputSchema,
   },
   async (input) => {
+    // To avoid free tier rate limits, we will only generate one variation.
     const prompts = [
         `Generate a realistic variation of the product in this image from a slightly different angle. Maintain a clean, professional, well-lit studio setting with a neutral background.`,
-        `Create a version of the product in this image with slightly brighter, more dramatic lighting. Keep the background neutral and the setting professional.`,
-        `Generate a close-up shot of the product in this image, highlighting its texture and key features. The setting should be a simple, well-lit studio.`,
-        `Produce a variation of the product in this image as if it were featured in a high-end product catalog. Adjust lighting and angle for a premium feel, but keep the background simple.`
     ];
 
     const imageUrls: string[] = [];
 
     try {
-        // Process requests sequentially to avoid rate limiting
-        for (const promptText of prompts) {
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash',
-            prompt: [
-            { media: { url: input.photoDataUri } },
-            { text: promptText },
-            ],
-            config: {
-            responseModalities: ['IMAGE'],
-            },
-        });
+        // DEBUG: Print the API key to the console to verify it's being loaded correctly.
+        console.log('Using API Key:', process.env.GOOGLE_API_KEY ? `...${process.env.GOOGLE_API_KEY.slice(-4)}` : 'Not Found');
 
-        if (media?.url) {
-            imageUrls.push(media.url);
+        const match = input.photoDataUri.match(/data:(image\/[^;]+);base64,(.+)/);
+        if (!match) {
+          throw new Error('Invalid photo data URI format. Expected format: data:<mimetype>;base64,<encoded_data>.');
         }
+
+        const [, mimeType] = match;
+
+        const media = {
+            media: {
+              url: input.photoDataUri,
+              contentType: mimeType,
+            },
+          };
+      
+          // Revert to the original, correct model for image-to-image tasks.
+          const model = 'googleai/gemini-2.5-flash-image-preview';
+      
+          // Process requests sequentially to avoid rate limiting
+          for (const promptText of prompts) {
+            const response = await ai.generate({
+              model,
+              prompt: [media, { text: promptText }],
+              config: {
+                responseModalities: ['IMAGE'],
+              },
+            });
+      
+            if (response.media?.url) {
+              imageUrls.push(response.media.url);
+            }
         // Add a delay to avoid hitting rate limits
         await new Promise(resolve => setTimeout(resolve, 1000));
         }
     } catch (error) {
-        console.error('Error generating image variations, likely due to rate limiting:', error);
+        console.error('Error generating image variations:', error);
         // Return empty array to prevent crashing the client
         return { images: [] };
     }
