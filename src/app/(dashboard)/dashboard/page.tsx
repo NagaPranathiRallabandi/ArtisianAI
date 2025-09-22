@@ -39,7 +39,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
-import { generateImageVariations } from '@/ai/flows/generate-image-variations';
 
 
 // Mock data - replace with actual data fetching
@@ -195,13 +194,29 @@ function AddProductDialog() {
         }
     };
     
+    // This is the new, updated handleGenerate function
     const handleGenerate = async () => {
         if (!originalImage) return;
         setIsGenerating(true);
         setStep('GENERATE');
         
         try {
-            const result = await generateImageVariations({ photoDataUri: originalImage });
+            // Use fetch to call your new API route
+            const response = await fetch('/api/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ photoDataUri: originalImage }),
+            });
+
+            if (!response.ok) {
+                // If the server responds with an error, throw it to the catch block
+                const errorData = await response.json();
+                throw new Error(errorData.details || 'API request failed');
+            }
+
+            const result = await response.json();
 
             if (result.images && result.images.length > 0) {
                 setGeneratedImages(result.images);
